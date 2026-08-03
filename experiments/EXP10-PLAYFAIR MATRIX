@@ -1,1 +1,129 @@
 
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+//playfair matrix
+char matrix[5][5] = {
+    {'M','F','H','I','K'},
+    {'U','N','O','P','Q'},
+    {'Z','V','W','X','Y'},
+    {'E','L','A','R','G'},
+    {'D','S','T','B','C'}
+};
+
+void findPosition(char ch, int *row, int *col)
+{
+    if(ch == 'J')
+        ch = 'I';
+
+    for(int i = 0; i < 5; i++)
+    {
+        for(int j = 0; j < 5; j++)
+        {
+            if(matrix[i][j] == ch)
+            {
+                *row = i;
+                *col = j;
+                return;
+            }
+        }
+    }
+}
+
+void prepareText(char text[])
+{
+    char temp[200];
+    int i, j = 0;
+
+    // Remove spaces and convert to uppercase
+    for(i = 0; text[i] != '\0'; i++)
+    {
+        if(isalpha(text[i]))
+        {
+            char ch = toupper(text[i]);
+            if(ch == 'J')
+                ch = 'I';
+            temp[j++] = ch;
+        }
+    }
+    temp[j] = '\0';
+
+    char result[200];
+    int k = 0;
+
+    for(i = 0; temp[i] != '\0'; i++)
+    {
+        result[k++] = temp[i];
+
+        if(temp[i + 1] != '\0' && temp[i] == temp[i + 1])
+            result[k++] = 'X';
+    }
+
+    if(k % 2 != 0)
+        result[k++] = 'X';
+
+    result[k] = '\0';
+
+    strcpy(text, result);
+}
+
+void encrypt(char text[])
+{
+    int r1, c1, r2, c2;
+
+    printf("\nEncrypted Text:\n");
+
+    for(int i = 0; text[i] != '\0'; i += 2)
+    {
+        findPosition(text[i], &r1, &c1);
+        findPosition(text[i + 1], &r2, &c2);
+
+        if(r1 == r2)
+        {
+            printf("%c%c",
+                matrix[r1][(c1 + 1) % 5],
+                matrix[r2][(c2 + 1) % 5]);
+        }
+        else if(c1 == c2)
+        {
+            printf("%c%c",
+                matrix[(r1 + 1) % 5][c1],
+                matrix[(r2 + 1) % 5][c2]);
+        }
+        else
+        {
+            printf("%c%c",
+                matrix[r1][c2],
+                matrix[r2][c1]);
+        }
+
+        printf(" ");
+    }
+
+    printf("\n");
+}
+
+int main()
+{
+    char text[200];
+
+    printf("Playfair Matrix:\n\n");
+
+    for(int i = 0; i < 5; i++)
+    {
+        for(int j = 0; j < 5; j++)
+            printf("%c ", matrix[i][j]);
+        printf("\n");
+    }
+
+    printf("\nEnter Plain Text:\n");
+    fgets(text, sizeof(text), stdin);
+
+    prepareText(text);
+
+    printf("\nPrepared Text : %s\n", text);
+
+    encrypt(text);
+
+    return 0;
+}
