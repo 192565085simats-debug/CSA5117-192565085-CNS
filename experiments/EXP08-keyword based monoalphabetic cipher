@@ -1,1 +1,84 @@
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+//keyword based monoalphabetic cipher
+int main()
+{
+    char keyword[] = "CIPHER";
+    char plain[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    char cipher[27];
+    char text[100], encrypt[100], decrypt[100];
+    int used[26] = {0};
+    int i, j = 0;
 
+    // Generate cipher alphabet using keyword
+    for(i = 0; keyword[i] != '\0'; i++)
+    {
+        char ch = toupper(keyword[i]);
+        if(!used[ch - 'A'])
+        {
+            cipher[j++] = ch;
+            used[ch - 'A'] = 1;
+        }
+    }
+
+    // Add remaining unused letters
+    for(i = 0; i < 26; i++)
+    {
+        if(!used[i])
+        {
+            cipher[j++] = 'A' + i;
+        }
+    }
+    cipher[j] = '\0';
+
+    printf("Plain Alphabet : %s\n", plain);
+    printf("Cipher Alphabet: %s\n\n", cipher);
+
+    printf("Enter Plain Text: ");
+    fgets(text, sizeof(text), stdin);
+
+    // Encryption
+    for(i = 0; text[i] != '\0'; i++)
+    {
+        if(isalpha(text[i]))
+        {
+            char ch = toupper(text[i]);
+            encrypt[i] = cipher[ch - 'A'];
+        }
+        else
+        {
+            encrypt[i] = text[i];
+        }
+    }
+    encrypt[i] = '\0';
+
+    printf("\nEncrypted Text : %s", encrypt);
+
+    // Decryption
+    for(i = 0; encrypt[i] != '\0'; i++)
+    {
+        if(isalpha(encrypt[i]))
+        {
+            char ch = encrypt[i];
+            int k;
+            for(k = 0; k < 26; k++)
+            {
+                if(cipher[k] == ch)
+                {
+                    decrypt[i] = plain[k];
+                    break;
+                }
+            }
+        }
+        else
+        {
+            decrypt[i] = encrypt[i];
+        }
+    }
+    decrypt[i] = '\0';
+
+    printf("Decrypted Text : %s\n", decrypt);
+
+    return 0;
+}
